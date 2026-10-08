@@ -48,19 +48,19 @@ export const MusicPlayer = ({ currentTrackKey, isUserInteracted, onTogglePlay })
         ctx.resume();
       }
 
-      // Base frequencies corresponding to Indian Raag ambient drone harmonies
+      // Base frequencies for authentic Indian wedding ambient harmonies
       const freqs = key === 'haldi' 
         ? [293.66, 369.99, 440.00] // D, F#, A (Bright Yellow Joy)
         : key === 'mehandi'
-        ? [261.63, 329.63, 392.00] // C, E, G
+        ? [261.63, 329.63, 392.00] // C, E, G (Traditional Henna)
         : key === 'barat'
         ? [329.63, 415.30, 493.88] // E, G#, B (Festive Grandeur)
         : key === 'vidai'
         ? [220.00, 261.63, 329.63] // A, C, E (Emotional Melodic Minor)
-        : [220.00, 277.18, 329.63]; // A, C#, E (Royal Traditional Wedding Shehnai Chord)
+        : [220.00, 277.18, 329.63]; // A, C#, E (Royal Shehnai Harmony)
 
       const masterGain = ctx.createGain();
-      masterGain.gain.setValueAtTime(0.08, ctx.currentTime);
+      masterGain.gain.setValueAtTime(0.12, ctx.currentTime);
       masterGain.connect(ctx.destination);
 
       const oscs = freqs.map((f, i) => {
@@ -68,7 +68,7 @@ export const MusicPlayer = ({ currentTrackKey, isUserInteracted, onTogglePlay })
         const gain = ctx.createGain();
         osc.type = i === 0 ? 'sine' : 'triangle';
         osc.frequency.setValueAtTime(f, ctx.currentTime);
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.setValueAtTime(0.35, ctx.currentTime);
         osc.connect(gain);
         gain.connect(masterGain);
         osc.start();
@@ -85,10 +85,14 @@ export const MusicPlayer = ({ currentTrackKey, isUserInteracted, onTogglePlay })
     const audioUrl = trackMap[currentTrackKey] || trackMap.wedding;
     
     if (audioRef.current) {
-      audioRef.current.pause();
+      try {
+        audioRef.current.pause();
+      } catch (e) {}
     }
 
-    const audio = new Audio(audioUrl);
+    const audio = new Audio();
+    audio.src = audioUrl;
+    audio.crossOrigin = "anonymous";
     audio.loop = true;
     audio.volume = 0;
     audioRef.current = audio;
@@ -100,20 +104,20 @@ export const MusicPlayer = ({ currentTrackKey, isUserInteracted, onTogglePlay })
         .then(() => {
           setIsPlaying(true);
           stopSynthFallback();
-          // Smooth volume fade up
+          // Smooth volume fade up to full clear audibility
           let vol = 0;
           const fadeInterval = setInterval(() => {
-            vol += 0.05;
-            if (vol >= 0.6) {
-              audio.volume = 0.6;
+            vol += 0.08;
+            if (vol >= 0.75) {
+              audio.volume = 0.75;
               clearInterval(fadeInterval);
             } else {
               audio.volume = vol;
             }
-          }, 60);
+          }, 50);
         })
         .catch((err) => {
-          console.log('Audio file play prevented, using shehnai synth drone fallback:', err);
+          console.log('HTML5 Audio playback prevented by browser, switching to shehnai synth fallback:', err);
           setIsPlaying(true);
           startSynthFallback(currentTrackKey);
         });
@@ -125,7 +129,9 @@ export const MusicPlayer = ({ currentTrackKey, isUserInteracted, onTogglePlay })
       if (audioRef.current) audioRef.current.pause();
       stopSynthFallback();
       setIsPlaying(false);
+      setIsMuted(true);
     } else {
+      setIsMuted(false);
       playCurrentTrack();
     }
     if (onTogglePlay) onTogglePlay();
@@ -135,7 +141,7 @@ export const MusicPlayer = ({ currentTrackKey, isUserInteracted, onTogglePlay })
     <div className="fixed bottom-5 right-5 z-40">
       <button
         onClick={togglePlay}
-        className="flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-amber-950/90 via-maroon-dark/90 to-amber-950/90 text-amber-200 border border-amber-400/60 shadow-gold-glow backdrop-blur-md hover:scale-105 active:scale-95 transition-all group"
+        className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-amber-950/95 via-maroon-dark/95 to-amber-950/95 text-amber-200 border-2 border-amber-400/80 shadow-[0_0_20px_rgba(212,175,55,0.6)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all group cursor-pointer"
       >
         <div className="relative flex items-center justify-center">
           {isPlaying ? (
@@ -150,14 +156,14 @@ export const MusicPlayer = ({ currentTrackKey, isUserInteracted, onTogglePlay })
           )}
         </div>
 
-        <span className="text-xs font-serif tracking-wider font-semibold text-gold-gradient">
-          {isPlaying ? '♪ Music On' : 'Music Off'}
+        <span className="text-xs font-serif tracking-wider font-bold text-gold-gradient">
+          {isPlaying ? '♪ Music On' : 'Tap for Music'}
         </span>
 
         {isPlaying ? (
-          <Volume2 className="w-3.5 h-3.5 text-amber-300 opacity-80" />
+          <Volume2 className="w-4 h-4 text-amber-300 opacity-90" />
         ) : (
-          <VolumeX className="w-3.5 h-3.5 text-amber-400/60" />
+          <VolumeX className="w-4 h-4 text-amber-400/60" />
         )}
       </button>
     </div>
