@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WeddingCover } from './pages/WeddingCover';
 import { WelcomePage } from './pages/WelcomePage';
 import { EventsPage } from './pages/EventsPage';
@@ -18,6 +18,21 @@ export default function App() {
   const [targetPage, setTargetPage] = useState(null);
   const [targetEventId, setTargetEventId] = useState(null);
   const [isUserInteracted, setIsUserInteracted] = useState(false);
+
+  // Activate music immediately on user's first tap or click anywhere on screen
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      setIsUserInteracted(true);
+    };
+
+    window.addEventListener('click', handleFirstInteraction, { once: true });
+    window.addEventListener('touchstart', handleFirstInteraction, { once: true });
+
+    return () => {
+      window.removeEventListener('click', handleFirstInteraction);
+      window.removeEventListener('touchstart', handleFirstInteraction);
+    };
+  }, []);
 
   // Trigger curtain navigation sequence
   const navigateWithCurtain = (newPage, newEventId = null) => {

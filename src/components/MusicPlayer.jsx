@@ -92,9 +92,9 @@ export const MusicPlayer = ({ currentTrackKey, isUserInteracted, onTogglePlay })
 
     const audio = new Audio();
     audio.src = audioUrl;
-    audio.crossOrigin = "anonymous";
+    audio.preload = 'auto';
     audio.loop = true;
-    audio.volume = 0;
+    audio.volume = 0.85;
     audioRef.current = audio;
 
     const playPromise = audio.play();
@@ -104,20 +104,9 @@ export const MusicPlayer = ({ currentTrackKey, isUserInteracted, onTogglePlay })
         .then(() => {
           setIsPlaying(true);
           stopSynthFallback();
-          // Smooth volume fade up to full clear audibility
-          let vol = 0;
-          const fadeInterval = setInterval(() => {
-            vol += 0.08;
-            if (vol >= 0.75) {
-              audio.volume = 0.75;
-              clearInterval(fadeInterval);
-            } else {
-              audio.volume = vol;
-            }
-          }, 50);
         })
         .catch((err) => {
-          console.log('HTML5 Audio playback prevented by browser, switching to shehnai synth fallback:', err);
+          console.log('Audio playback waiting for user gesture or fallback:', err);
           setIsPlaying(true);
           startSynthFallback(currentTrackKey);
         });
