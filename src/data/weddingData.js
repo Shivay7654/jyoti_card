@@ -60,7 +60,7 @@ export const WEDDING_DATA = {
       title: "Haldi Ceremony",
       shortTitle: "Haldi",
       date: "21 November 2026",
-      time: "10:00 AM",
+      time: "01:00 PM",
       venue: "Mangalam Hotel",
       venueAddress: "Sasaram, Bihar",
       locationLink: "https://maps.google.com/?q=Mangalam+Hotel,+Sasaram,+Bihar",
