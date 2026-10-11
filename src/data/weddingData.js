@@ -3,7 +3,7 @@ const getAsset = (path) => `${import.meta.env.BASE_URL || './'}${path.replace(/^
 export const WEDDING_DATA = {
   groom: "Ravi Prakash",
   bride: "Jyoti Singh",
-  coupleTitle: "Ravi & Jyoti",
+  coupleTitle: "Jyoti & Ravi",
   weddingDate: "2026-11-21T10:00:00", // Target date for countdown
   weddingDateFormatted: "21 November 2026",
   mainVenue: "Mangalam Hotel, Sasaram, Bihar",
