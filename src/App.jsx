@@ -6,14 +6,8 @@ import { EventDetailPage } from './pages/EventDetailPage';
 import { CurtainTransition } from './components/CurtainTransition';
 import { MusicPlayer } from './components/MusicPlayer';
 import { FloatingPetals } from './components/FloatingPetals';
-import { PasswordGate } from './components/PasswordGate';
 
 export default function App() {
-  // Passcode Protection State (Password: 123456)
-  const [isUnlocked, setIsUnlocked] = useState(() => {
-    return sessionStorage.getItem('wedding_invitation_unlocked') === 'true';
-  });
-
   // Navigation State
   // 'cover' | 'welcome' | 'events' | 'detail'
   const [currentPage, setCurrentPage] = useState('cover');
@@ -65,62 +59,50 @@ export default function App() {
       {/* Main Mobile App Container (360px - 430px+ optimized, 100% full screen on mobile, phone canvas on desktop) */}
       <div className="w-full max-w-[440px] min-h-screen-ios h-screen md:h-[90vh] md:max-h-[920px] md:rounded-[44px] md:border-[8px] md:border-amber-400/50 md:shadow-[0_0_60px_rgba(212,175,55,0.3)] bg-[#120205] relative overflow-hidden flex flex-col z-10">
         
-        {/* Passcode Lock Gate (Requires password: 123456) */}
-        {!isUnlocked ? (
-          <PasswordGate
-            onAuthenticated={() => {
-              setIsUnlocked(true);
-              setIsUserInteracted(true);
-            }}
-          />
-        ) : (
-          <>
-            {/* Global Floating Marigold & Rose Petals */}
-            <FloatingPetals count={currentPage === 'cover' ? 22 : 12} />
+        {/* Global Floating Marigold & Rose Petals */}
+        <FloatingPetals count={currentPage === 'cover' ? 22 : 12} />
 
-            {/* Dynamic Page Rendering */}
-            <div className="w-full h-full relative z-10 flex flex-col overflow-y-auto">
-              {currentPage === 'cover' && (
-                <WeddingCover
-                  onOpenInvitation={() => navigateWithCurtain('welcome')}
-                />
-              )}
-
-              {currentPage === 'welcome' && (
-                <WelcomePage
-                  onViewEvents={() => navigateWithCurtain('events')}
-                />
-              )}
-
-              {currentPage === 'events' && (
-                <EventsPage
-                  onSelectEvent={(eventId) => navigateWithCurtain('detail', eventId)}
-                  onBackToWelcome={() => navigateWithCurtain('cover')}
-                />
-              )}
-
-              {currentPage === 'detail' && selectedEventId && (
-                <EventDetailPage
-                  eventId={selectedEventId}
-                  onBackToEvents={() => navigateWithCurtain('events')}
-                />
-              )}
-            </div>
-
-            {/* Curtain Transition overlay */}
-            <CurtainTransition
-              isOpen={isCurtainOpen}
-              onAnimationComplete={handleCurtainClosed}
+        {/* Dynamic Page Rendering */}
+        <div className="w-full h-full relative z-10 flex flex-col overflow-y-auto">
+          {currentPage === 'cover' && (
+            <WeddingCover
+              onOpenInvitation={() => navigateWithCurtain('welcome')}
             />
+          )}
 
-            {/* Global Music Control Widget */}
-            <MusicPlayer
-              currentTrackKey={currentMusicKey}
-              isUserInteracted={isUserInteracted}
-              onTogglePlay={() => setIsUserInteracted(true)}
+          {currentPage === 'welcome' && (
+            <WelcomePage
+              onViewEvents={() => navigateWithCurtain('events')}
             />
-          </>
-        )}
+          )}
+
+          {currentPage === 'events' && (
+            <EventsPage
+              onSelectEvent={(eventId) => navigateWithCurtain('detail', eventId)}
+              onBackToWelcome={() => navigateWithCurtain('cover')}
+            />
+          )}
+
+          {currentPage === 'detail' && selectedEventId && (
+            <EventDetailPage
+              eventId={selectedEventId}
+              onBackToEvents={() => navigateWithCurtain('events')}
+            />
+          )}
+        </div>
+
+        {/* Curtain Transition overlay */}
+        <CurtainTransition
+          isOpen={isCurtainOpen}
+          onAnimationComplete={handleCurtainClosed}
+        />
+
+        {/* Global Music Control Widget */}
+        <MusicPlayer
+          currentTrackKey={currentMusicKey}
+          isUserInteracted={isUserInteracted}
+          onTogglePlay={() => setIsUserInteracted(true)}
+        />
       </div>
     </div>
   );
